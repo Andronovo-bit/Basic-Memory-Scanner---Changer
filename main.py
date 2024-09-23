@@ -1,50 +1,47 @@
 from src.process.process_list import list_all_processes
-from src.process.process_search import search_process_by_name
+from src.process.process_search import search_process_by_name, search_process_by_pid
 from src.memory.memory_reader import open_process, close_process
 from src.memory.memory_writer import write_memory
-from src.memory.memory_scanner import scan_memory
+from src.memory.memory_scanner import scan_memory, save_addresses_to_json, check_for_changes
 from src.config.config import Config
 
 def main_menu():
-    print("\n=== Ana Menü ===")
-    print("1. Process'leri listele")
-    print("2. Process adı ile ara")
-    print("3. Process ID ile ara")
-    print("4. Bellek taraması yap ve JSON dosyasına kaydet")
-    print("5. Bellekte değer değiştir")
-    print("6. Çıkış")
-    return input("Bir seçenek girin: ")
+    print("1. List Processes")
+    print("2. Search Process by Name")
+    print("3. Search Process by PID")
+    print("4. Scan Memory")
+    print("5. Write Memory")
+    print("6. Check for Memory Changes")
+    print("7. Exit")
+    return input("Choose an option: ").strip()
 
 def list_processes():
     processes = list_all_processes()
-    print(Config.TOTAL_PROCESSES_FOUND.format(len(processes)))
+    print(f"Toplam {len(processes)} process bulundu:\n")
     for process in processes:
         print(f"PID: {process['pid']}, Name: {process['name']}")
-    return
 
 def search_process_by_name_menu():
     name = input("Aramak istediğiniz işlem adını girin: ").strip()
     results = search_process_by_name(name)
     if results:
-        print(Config.PROCESS_FOUND_BY_NAME.format(len(results)))
+        print(f"{len(results)} işlem bulundu:")
         for process in results:
             print(f"PID: {process['pid']}, Name: {process['name']}")
     else:
-        print(Config.PROCESS_NOT_FOUND_BY_NAME.format(name))
-    return
+        print("İşlem bulunamadı.")
 
 def search_process_by_pid_menu():
-    pid_input = input("İşlem için PID girin: ").strip()
+    pid_input = input("Aramak istediğiniz işlem PID'sini girin: ").strip()
     try:
         pid = int(pid_input)
-        process_handle = open_process(pid)
-        print(f"Process {pid} açıldı.")
-        close_process(process_handle)
+        results = search_process_by_pid(pid)
+        if results:
+            print(f"PID: {results[0]['pid']}, Name: {results[0]['name']}")
+        else:
+            print("İşlem bulunamadı.")
     except ValueError:
         print(Config.INVALID_PID)
-    except Exception as e:
-        print(f"Process açma hatası: {e}")
-    return
 
 def scan_memory_menu():
     pid_input = input("Bellek taraması için işlem PID'sini girin: ").strip()
@@ -57,7 +54,8 @@ def scan_memory_menu():
         print(f"Aranan değer: {search_value}")
 
         # Bellek taraması ve JSON dosyasına kaydetme
-        scan_memory(process_handle, search_value)
+        found_addresses = scan_memory(process_handle, search_value)
+        save_addresses_to_json(found_addresses)
 
         close_process(process_handle)
     except ValueError:
@@ -89,6 +87,22 @@ def write_memory_menu():
         print(f"Bellek yazma hatası: {e}")
     return
 
+def check_memory_changes_menu():
+    pid_input = input("Bellek değişikliklerini kontrol etmek için işlem PID'sini girin: ").strip()
+    try:
+        pid = int(pid_input)
+        process_handle = open_process(pid)
+
+        # Bellek değişikliklerini kontrol etme
+        check_for_changes(process_handle)
+
+        close_process(process_handle)
+    except ValueError:
+        print(Config.INVALID_PID)
+    except Exception as e:
+        print(f"Bellek okuma hatası: {e}")
+    return
+
 def main():
     print(Config.WELCOME_MESSAGE)
 
@@ -106,6 +120,8 @@ def main():
         elif choice == "5":
             write_memory_menu()
         elif choice == "6":
+            check_memory_changes_menu()
+        elif choice == "7":
             print(Config.EXIT_PROMPT)
             break
         else:
