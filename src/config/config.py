@@ -1,0 +1,12 @@
+class Config:
+    WELCOME_MESSAGE = "Process arama aracına hoş geldiniz!"
+    LIST_COMMAND_INFO = "Tüm işlemleri listelemek için 'list', işlem adıyla arama yapmak için 'search_name', PID ile arama yapmak için 'search_pid' yazın."
+    EXIT_PROMPT = "Programdan çıkılıyor."
+    INVALID_COMMAND = "Geçersiz komut, lütfen tekrar deneyin."
+    TOTAL_PROCESSES_FOUND = "Toplam {} process bulundu:\n"
+    PROCESS_FOUND_BY_NAME = "{} işlem bulundu:"
+    PROCESS_NOT_FOUND_BY_NAME = "'{}' isminde işlem bulunamadı."
+    PROCESS_FOUND_BY_PID = "PID: {}, Name: {}"
+    PROCESS_NOT_FOUND_BY_PID = "PID {} için işlem bulunamadı."
+    ENTER_COMMAND = "Komut girin (çıkmak için 'exit'): "
+    INVALID_PID = "Geçerli bir PID girin."
