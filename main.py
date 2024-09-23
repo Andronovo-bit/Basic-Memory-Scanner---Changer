@@ -6,6 +6,7 @@ from src.memory.memory_scanner import scan_memory, save_addresses_to_json, check
 from src.config.config import Config
 
 def main_menu():
+    """Display the main menu and get user choice."""
     print("1. List Processes")
     print("2. Search Process by Name")
     print("3. Search Process by PID")
@@ -16,44 +17,47 @@ def main_menu():
     return input("Choose an option: ").strip()
 
 def list_processes():
+    """List all running processes."""
     processes = list_all_processes()
-    print(f"Toplam {len(processes)} process bulundu:\n")
+    print(f"Total {len(processes)} processes found:\n")
     for process in processes:
         print(f"PID: {process['pid']}, Name: {process['name']}")
 
 def search_process_by_name_menu():
-    name = input("Aramak istediğiniz işlem adını girin: ").strip()
+    """Search for processes by name."""
+    name = input("Enter the process name to search: ").strip()
     results = search_process_by_name(name)
     if results:
-        print(f"{len(results)} işlem bulundu:")
+        print(f"{len(results)} processes found:")
         for process in results:
             print(f"PID: {process['pid']}, Name: {process['name']}")
     else:
-        print("İşlem bulunamadı.")
+        print("No processes found.")
 
 def search_process_by_pid_menu():
-    pid_input = input("Aramak istediğiniz işlem PID'sini girin: ").strip()
+    """Search for a process by PID."""
+    pid_input = input("Enter the PID of the process to search: ").strip()
     try:
         pid = int(pid_input)
         results = search_process_by_pid(pid)
         if results:
             print(f"PID: {results[0]['pid']}, Name: {results[0]['name']}")
         else:
-            print("İşlem bulunamadı.")
+            print("No process found.")
     except ValueError:
         print(Config.INVALID_PID)
 
 def scan_memory_menu():
-    pid_input = input("Bellek taraması için işlem PID'sini girin: ").strip()
+    """Scan the memory of a process."""
+    pid_input = input("Enter the PID of the process to scan memory: ").strip()
     try:
         pid = int(pid_input)
         process_handle = open_process(pid)
 
-        search_value = input("Aramak istediğiniz değeri girin: ")
+        search_value = input("Enter the value to search for: ").strip()
         search_value = int(search_value)
-        print(f"Aranan değer: {search_value}")
+        print(f"Searching for value: {search_value}")
 
-        # Bellek taraması ve JSON dosyasına kaydetme
         found_addresses = scan_memory(process_handle, search_value)
         save_addresses_to_json(found_addresses)
 
@@ -61,49 +65,46 @@ def scan_memory_menu():
     except ValueError:
         print(Config.INVALID_PID)
     except Exception as e:
-        print(f"Bellek okuma hatası: {e}")
-    return
+        print(f"Memory read error: {e}")
 
 def write_memory_menu():
-    pid_input = input("Bellek değeri değiştirmek için işlem PID'sini girin: ").strip()
+    """Write a value to a specific memory address of a process."""
+    pid_input = input("Enter the PID of the process to write memory: ").strip()
     try:
         pid = int(pid_input)
         process_handle = open_process(pid)
 
-        # Kullanıcıdan adresi ve yeni değeri iste
-        address = input("Değeri değiştirmek istediğiniz bellek adresini girin (hex formatında): ").strip()
+        address = input("Enter the memory address to change (in hex format): ").strip()
         address = int(address, 16)
-        new_value = input("Yeni değer girin: ").strip()
+        new_value = input("Enter the new value: ").strip()
         new_value = int(new_value)
 
-        # Bellekte yazma işlemi
         write_memory(process_handle, address, new_value, 4)
-        print(f"Değer {hex(address)} adresinde {new_value} olarak değiştirildi.")
+        print(f"Value at address {hex(address)} changed to {new_value}.")
 
         close_process(process_handle)
     except ValueError:
         print(Config.INVALID_PID)
     except Exception as e:
-        print(f"Bellek yazma hatası: {e}")
-    return
+        print(f"Memory write error: {e}")
 
 def check_memory_changes_menu():
-    pid_input = input("Bellek değişikliklerini kontrol etmek için işlem PID'sini girin: ").strip()
+    """Check for changes in memory values of a process."""
+    pid_input = input("Enter the PID of the process to check memory changes: ").strip()
     try:
         pid = int(pid_input)
         process_handle = open_process(pid)
 
-        # Bellek değişikliklerini kontrol etme
         check_for_changes(process_handle)
 
         close_process(process_handle)
     except ValueError:
         print(Config.INVALID_PID)
     except Exception as e:
-        print(f"Bellek okuma hatası: {e}")
-    return
+        print(f"Memory read error: {e}")
 
 def main():
+    """Main function to run the memory analyzer."""
     print(Config.WELCOME_MESSAGE)
 
     while True:
