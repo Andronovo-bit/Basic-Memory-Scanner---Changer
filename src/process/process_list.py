@@ -17,7 +17,8 @@ def list_all_processes() -> List[Dict[str, str]]:
             ),
             key=lambda x: x['name']
         )
-    except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+    except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess) as e:
+        print(f"Error occurred while listing processes: {e}")
         processes = []
 
     return processes
