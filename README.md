@@ -31,8 +31,8 @@ src/
 
 1. Clone the repository:
     ```sh
-    git clone https://github.com/yourusername/memory_analyzer.git
-    cd memory_analyzer
+    git clone https://github.com/Andronovo-bit/Basic-Memory-Scanner-Changer.git
+    cd Basic-Memory-Scanner-Changer
     ```
 
 2. Install the required dependencies:
